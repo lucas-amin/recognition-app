@@ -1,4 +1,4 @@
-from .FacialRecognition import FacialRecognition
+from .FacialRecognizer import FacialRecognizer
 import argparse
 import cv2
 
@@ -6,29 +6,33 @@ from .Tracker import Tracker
 
 
 class Facer:
-    def __init__(self, frame_width, frame_height, save_width, save_height):
+    facer_object = None
+
+    def __init__(self):
         self.args = Facer.parse_arguments()
-
-        self.video_out = cv2.VideoWriter(self.args.video_out, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), 30,
-                                         (save_width, save_height))
-
-        self.save_width = save_width
-        self.save_height = save_height
-        self.facial_recogition = FacialRecognition(self)
+        self.facial_recognizer = FacialRecognizer(self)
         self.tracker = Tracker(self)
-
         self.frame_id = 0
 
-    def recognize_with_tracking(self, frame, frame_id):
-        frame = cv2.resize(frame, (self.save_width, self.save_height))
+    @staticmethod
+    def getFacerObject():
+        if Facer.facer_object is None:
+            Facer.facer_object = Facer()
 
+        Facer.facer_object.reset()
+
+        return Facer.facer_object
+
+    def reset(self):
+        self.tracker.reset()
+        self.facial_recognizer.reset()
+
+    def recognize_with_tracking(self, frame, frame_id):
         result, result_frame = self.tracker.track(frame, frame_id)
 
         return result, result_frame
 
     def recognize_without_tracking(self, frame, frame_id):
-        frame = cv2.resize(frame, (self.save_width, self.save_height))
-
         result, result_frame = self.tracker.track(frame, frame_id)
 
         return result, result_frame
@@ -45,7 +49,6 @@ class Facer:
                         help='Path to embeddings')
         ap.add_argument("--video-out", default="../datasets/videos_output/stream_test.mp4",
                         help='Path to output video')
-
         ap.add_argument('--image-size', default='112,112', help='')
         ap.add_argument('--model', default='../insightface/models/model-y1-test2/model,0', help='path to load model.')
         ap.add_argument('--ga-model', default='', help='path to load model.')

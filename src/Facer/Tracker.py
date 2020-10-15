@@ -10,7 +10,11 @@ class Tracker():
         self.texts = []
 
         self.facer = facer
-        self.recognizer = facer.facial_recogition
+        self.recognizer = facer.facial_recognizer
+
+    def reset(self):
+        self.trackers = []
+        self.texts = []
 
     def track(self, frame, frame_number):
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
