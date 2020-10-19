@@ -1,0 +1,11 @@
+scikit-build
+cmake
+scikit-learn
+easydict
+dlib
+mxnet
+scikit-image
+opencv-python
+mtcnn
+tensorflow-gpu
+pandas

@@ -1,11 +1,6 @@
 import sys
 
-# Start streaming and recording
-import time
-
-import cv2
-
-from src.Facer.Facer import Facer
+from Facer.Facer import Facer
 sys.path.append('../insightface/deploy')
 sys.path.append('../insightface/src/common')
 
