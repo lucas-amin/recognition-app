@@ -19,6 +19,13 @@ class Facer:
         if Facer.facer_object is None:
             Facer.facer_object = Facer()
 
+        return Facer.facer_object
+
+    @staticmethod
+    def getAndResetFacerObject():
+        if Facer.facer_object is None:
+            Facer.facer_object = Facer()
+
         Facer.facer_object.reset()
 
         return Facer.facer_object
@@ -32,10 +39,14 @@ class Facer:
 
         return result, result_frame
 
-    def recognize_without_tracking(self, frame, frame_id):
-        result, result_frame = self.tracker.track(frame, frame_id)
+    def recognize_without_tracking(self, frame):
+        result, result_frame = self.facial_recognizer.recognize(frame)
 
         return result, result_frame
+
+    def recognize_without_tracking_threadsafe(self, frame):
+        frame, result = self.facial_recognizer.recognize_threadsafe(frame)
+        return frame, result
 
     @staticmethod
     def parse_arguments():

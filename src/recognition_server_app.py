@@ -1,10 +1,11 @@
 import base64
 import io
 import sys
+import time
 from io import StringIO
+from threading import Lock, Thread
 
 import cv2
-import imutils as imutils
 from Facer.Facer import Facer
 sys.path.append('../insightface/deploy')
 sys.path.append('../insightface/src/common')
@@ -14,29 +15,24 @@ from flask import Flask, render_template
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
 import numpy as np
+from engineio.payload import Payload
+
 
 app = Flask(__name__)
-CORS(app)
 socketio = SocketIO(app)
-
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
     return render_template('index2.html')
 
-
 @socketio.on('image')
 def image(data_image):
-    global frame_id
     frame = get_frame(data_image)
+    frame, result = facer.recognize_without_tracking_threadsafe(frame)
+    encode_and_return(frame)
 
-    facer = Facer.getFacerObject()
-
-    # Process the image frame
-    # frame = imutils.resize(frame, width=700)
-    # frame = cv2.flip(frame, 1)
-
-    result, frame = facer.recognize_with_tracking(frame, frame_id=0)
+def encode_and_return(frame):
+    cv2.flip(frame, 1)
 
     imgencode = cv2.imencode('.jpg', frame)[1]
 
@@ -66,4 +62,6 @@ def get_frame(data_image):
 
 
 if __name__ == '__main__':
-    socketio.run(app, host='127.0.0.1', debug=True)
+    facer = Facer.getAndResetFacerObject()
+
+    socketio.run(app, host='0.0.0.0', debug=True)

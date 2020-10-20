@@ -11,6 +11,8 @@ import face_model
 import pickle
 import time
 import cv2
+from keras import backend as K
+import tensorflow as tf
 
 
 class FacialRecognizer():
@@ -22,7 +24,6 @@ class FacialRecognizer():
     texts = []
     frames = 0
 
-    #{OSError}Failed to interpret file <_io.BufferedReader name='/home/lucas/anaconda3/envs/insightface/lib/python3.6/site-packages/mtcnn/data/mtcnn_weights.npy'> as a pickle
     def __init__(self, facer):
         self.facer = facer
         self.args = facer.args
@@ -43,15 +44,30 @@ class FacialRecognizer():
         # Load the classifier model, determine if face is known
         self.model = load_model(self.args.mymodel)
 
+        # Clean up tensorflow graph
+        self.__Session = K.get_session()
+        self.__Graph = tf.get_default_graph()
+        # self.__Graph.finalize()
+
     def reset(self):
         self.embedding_model = face_model.FaceModel(self.args)
 
-    def process(self, frame):
+    def recognize_threadsafe(self, frame):
+        with self.__Session.as_default():
+            with self.__Graph.as_default():
+                frame, result = self.recognize(frame)
+
+        return frame, result
+
+    def recognize(self, frame):
         faces_bboxes = self.detector.detect_faces(frame)
         result = []
 
         if len(faces_bboxes) != 0:
             for bboxe in faces_bboxes:
+                bbox = bboxe['box']
+                bbox = np.array([bbox[0], bbox[1], bbox[0] + bbox[2], bbox[1] + bbox[3]])
+
                 preprocessed_image = self.preprocess(frame, bboxe['box'], bboxe['keypoints'])
 
                 # Extract features from face
@@ -65,7 +81,11 @@ class FacialRecognizer():
 
                 result.append({"name": name, "probability": probability, "bbbox": bboxe['box']})
 
-        return result
+                y = bbox[1] - 10 if bbox[1] - 10 > 10 else bbox[1] + 10
+                cv2.putText(frame, name, (bbox[0], y), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
+                cv2.rectangle(frame, (bbox[0], bbox[1]), (bbox[2], bbox[3]), (255, 0, 0), 2)
+
+        return frame, result
 
     @staticmethod
     def preprocess(frame, bbox, landmarks):
