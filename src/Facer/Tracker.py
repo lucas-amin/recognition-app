@@ -21,6 +21,8 @@ class Tracker():
         results = []
 
         if frame_number % self.track_frames == 0:
+            print("shape" + str(frame.shape))
+
             bboxes = self.recognizer.detector.detect_faces(frame)
             self.trackers = []
             self.texts = []

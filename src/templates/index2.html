@@ -3,56 +3,59 @@
     <video autoplay="true" id="videoElement"></video>
 </div>
 
-<div class = 'video'>
+<div class='video'>
     <img id="image">
 </div>
 
 <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+<script src="https://docs.opencv.org/3.4/opencv.js"></script>
 
-<script >
-    var socket = io('http://localhost:5000');
+<script>
+    cv['onRuntimeInitialized']=()=>{
+        var socket = io('http://localhost:5000');
 
-    socket.on('connect', function(){
-        console.log("Connected...!", socket.connected)
-    });
-
-    const video = document.querySelector("#videoElement");
-
-    video.width = 500;
-    video.height = 375;
-
-    if (navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ video: true })
-        .then(function (stream) {
-            video.srcObject = stream;
-            video.play();
-        })
-        .catch(function (err0r) {
-            console.log(err0r)
-            console.log("Something went wrong!");
+        socket.on('connect', function(){
+            console.log("Connected...!", socket.connected)
         });
-    }
 
-    let src = new cv.Mat(video.height, video.width, cv.CV_8UC4);
-    let dst = new cv.Mat(video.height, video.width, cv.CV_8UC1);
-    let cap = new cv.VideoCapture(video);
+        const video = document.querySelector("#videoElement");
 
-    const FPS = 22;
+        video.width = 1280;
+        video.height = 720;
 
-    setInterval(() => {
-        cap.read(src);
+        if (navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function (stream) {
+                video.srcObject = stream;
+                video.play();
+            })
+            .catch(function (err0r) {
+                console.log(err0r)
+                console.log("Something went wrong!");
+            });
+        }
 
-        var type = "image/png"
-        var data = document.getElementById("canvasOutput").toDataURL(type);
-        data = data.replace('data:' + type + ';base64,', ''); //split off junk at the beginning
+        let src = new cv.Mat(video.height, video.width, cv.CV_8UC4);
+        let dst = new cv.Mat(video.height, video.width, cv.CV_8UC1);
+        let cap = new cv.VideoCapture(video);
 
-        socket.emit('image', data);
-    }, 10000/FPS);
+        const FPS = 5;
+
+        setInterval(() => {
+            cap.read(src);
+
+            var type = "image/png"
+            var data = document.getElementById("canvasOutput").toDataURL(type);
+            data = data.replace('data:' + type + ';base64,', ''); //split off junk at the beginning
+
+            socket.emit('image', data);
+        }, 10000/FPS);
 
 
-    socket.on('response_back', function(image){
-        const image_id = document.getElementById('image');
-        image_id.src = image;
-    });
+        socket.on('response_back', function(image){
+            const image_id = document.getElementById('image');
+            image_id.src = image;
+        });
+    };
 
 </script>
