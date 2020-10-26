@@ -9,6 +9,8 @@
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
 
 <script>
+    var socket = io('http://localhost:5000');
+
 <!--     * Captures a image frame from the provided video element.-->
 <!--     * @param {Video} video HTML5 video element from where the image frame will be captured.-->
 <!--     * @param {Number} scaleFactor Factor to scale the canvas element that will be return. This is an optional parameter.-->
@@ -29,8 +31,6 @@
             ctx.drawImage(video, 0, 0, w, h);
         return canvas;
     }
-
-    const socket = io(null, {port: 8000, rememberTransport: false});
 
     socket.on('connect', function(){
         console.log("Connected...!", socket.connected)
