@@ -1,43 +1,67 @@
+import base64
+import io
 import sys
+import time
+from io import StringIO
+from threading import Lock, Thread
 
+import cv2
 from Facer.Facer import Facer
 sys.path.append('../insightface/deploy')
 sys.path.append('../insightface/src/common')
 
-from flask import Flask, render_template, Response
-from camera import VideoCamera
+from PIL import Image
+from flask import Flask, render_template
+from flask_cors import CORS
+from flask_socketio import SocketIO, emit
+import numpy as np
+from engineio.payload import Payload
+
 
 app = Flask(__name__)
+socketio = SocketIO(app)
 
-@app.route('/')
+@app.route('/', methods=['POST', 'GET'])
 def index():
-    return render_template('index.html')
+    return render_template('index2.html')
 
-@app.route('/video_feed')
-def video_feed():
-    return Response(gen(VideoCamera()), mimetype='multipart/x-mixed-replace; boundary=frame')
+@socketio.on('image')
+def image(data_image):
+    frame = get_frame(data_image)
+    frame, result = facer.recognize_without_tracking_threadsafe(frame)
+    encode_and_return(frame)
 
-def gen(camera):
-    cap = camera.video
-    frame_id = 0
-    facer = Facer.getFacerObject()
+def encode_and_return(frame):
+    cv2.flip(frame, 1)
 
-    try:
-        while cap.isOpened():
-            camera_on, frame = cap.read()
+    imgencode = cv2.imencode('.jpg', frame)[1]
 
-            result, result_frame = facer.recognize_with_tracking(frame, frame_id=frame_id)
+    # base64 encode
+    stringData = base64.b64encode(imgencode).decode('utf-8')
+    b64_src = 'data:image/jpg;base64,'
+    stringData = b64_src + stringData
 
-            frame_converted = camera.convert_numpymatrix_to_base64_string(result_frame)
+    # emit the frame back
+    emit('response_back', stringData)
 
-            frame_id += 1
 
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame_converted.tobytes() + b'\r\n\r\n')
+def get_frame(data_image):
+    sbuf = StringIO()
+    sbuf.write(data_image)
 
-    finally:
-        camera.video.release()
+    # decode and convert into image
+    bytes_image = io.BytesIO(base64.b64decode(data_image))
+    pillow_image = Image.open(bytes_image)
+
+    ## converting RGB to BGR, as opencv standards
+    frame = cv2.cvtColor(np.array(pillow_image), cv2.COLOR_RGB2BGR)
+
+    frame = cv2.resize(frame, (640, 480))
+
+    return frame
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
+    facer = Facer.getAndResetFacerObject()
+
+    socketio.run(app, host='http://194.61.21.96:5000/', debug=True)
