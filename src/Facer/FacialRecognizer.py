@@ -1,21 +1,16 @@
 import sys
 
+import insightface
+
+from src.Facer import FacePreprocesser
 from src.Facer.FacialDetector import FacialDetector
 
-sys.path.append('../insightface/deploy')
-sys.path.append('../insightface/src/common')
-
 from keras.models import load_model
-from mtcnn.mtcnn import MTCNN
-import face_preprocess
 import numpy as np
-import face_model
 import pickle
-import time
 import cv2
 from keras import backend as K
 import tensorflow as tf
-#from tensorflow.python.keras import backend as K
 
 class FacialRecognizer():
     # Initialize some useful arguments
@@ -41,7 +36,8 @@ class FacialRecognizer():
         self.facial_detector = FacialDetector()
 
         # Initialize faces embedding model
-        self.embedding_model = face_model.FaceModel(self.args)
+        self.embedding_model = insightface.model_zoo.get_model('arcface_r100_v1')
+        self.embedding_model.prepare(ctx_id=-1)
 
         # Load the classifier model, determine if face is known
         self.model = load_model(self.args.mymodel)
@@ -52,7 +48,7 @@ class FacialRecognizer():
         # self.__Graph.finalize()
 
     def reset(self):
-        self.embedding_model = face_model.FaceModel(self.args)
+        self.embedding_model = insightface.model_zoo.get_model('arcface_r100_v1')
 
     def recognize_threadsafe(self, frame):
         with self.__Session.as_default():
@@ -62,18 +58,17 @@ class FacialRecognizer():
         return frame, result
 
     def recognize(self, frame):
-        faces_bboxes = self.facial_detector.get_faces_bboxes(frame)
+        faces_bboxes, landmarks = self.facial_detector.get_faces_bboxes(frame)
         result = []
 
         if len(faces_bboxes) != 0:
-            for bboxe in faces_bboxes:
-                bbox = bboxe['box']
-                bbox = np.array([bbox[0], bbox[1], bbox[0] + bbox[2], bbox[1] + bbox[3]])
-
-                preprocessed_image = self.preprocess(frame, bboxe['box'], bboxe['keypoints'])
+            for bbox in faces_bboxes:
+                # preprocessed_image = self.preprocess(frame, bboxe['box'], bboxe['keypoints'])
+                x1, y1, w, h = int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3])
+                output_frame = frame[y1:y1 + h, x1:x1 + w]
 
                 # Extract features from face
-                embedding = self.embedding_model.get_feature(preprocessed_image).reshape(1, -1)
+                embedding = self.embedding_model.get_embedding(output_frame)
 
                 # Predict class from recognition model
                 preds = self.model.predict(embedding)
@@ -81,7 +76,7 @@ class FacialRecognizer():
 
                 name, probability = self.check_prediction(preds, embedding)
 
-                result.append({"name": name, "probability": probability, "bbbox": bboxe['box']})
+                result.append({"name": name, "probability": probability, "bbbox": bbox})
 
                 y = bbox[1] - 10 if bbox[1] - 10 > 10 else bbox[1] + 10
                 cv2.putText(frame, name, (bbox[0], y), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
@@ -99,7 +94,7 @@ class FacialRecognizer():
                               landmarks["mouth_left"][1], landmarks["mouth_right"][1]])
         landmarks = landmarks.reshape((2, 5)).T
 
-        transposed_image = face_preprocess.preprocess(frame, bbox_out, landmarks, image_size='112,112')
+        transposed_image = FacePreprocesser.preprocess(frame, bbox_out, landmarks, image_size='112,112')
 
         transposed_image = cv2.cvtColor(transposed_image, cv2.COLOR_BGR2RGB)
         transposed_image = np.transpose(transposed_image, (2, 0, 1))

@@ -41,7 +41,7 @@ class Tracker():
                     embedding = self.recognizer.embedding_model.get_feature(nimg).reshape(1, -1)
 
                     # Predict class
-                    preds = self.recognizer.model.predict(embedding)
+                    preds = self.recognizer.classifier_model.predict(embedding)
                     preds = preds.flatten()
 
                     name, probability = self.recognizer.check_prediction(preds, embedding)

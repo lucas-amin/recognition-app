@@ -1,7 +1,5 @@
 from .FacialRecognizer import FacialRecognizer
 import argparse
-import cv2
-
 from .Tracker import Tracker
 
 
@@ -52,17 +50,15 @@ class Facer:
     def parse_arguments():
         ap = argparse.ArgumentParser()
 
-        ap.add_argument("--mymodel", default="outputs/my_model.h5",
+        ap.add_argument("--mymodel", default="./Trainer/outputs/my_model.h5",
                         help="Path to recognizer model")
-        ap.add_argument("--le", default="outputs/le.pickle",
+        ap.add_argument("--le", default="./Trainer/outputs/le.pickle",
                         help="Path to label encoder")
-        ap.add_argument("--embeddings", default="outputs/embeddings.pickle",
+        ap.add_argument("--embeddings", default="./Trainer/outputs/embeddings.pickle",
                         help='Path to embeddings')
         ap.add_argument("--video-out", default="../datasets/videos_output/stream_test.mp4",
                         help='Path to output video')
         ap.add_argument('--image-size', default='112,112', help='')
-        ap.add_argument('--model', default='../insightface/models/model-y1-test2/model,0', help='path to load model.')
-        ap.add_argument('--ga-model', default='', help='path to load model.')
         ap.add_argument('--gpu', default=0, type=int, help='gpu id')
         ap.add_argument('--det', default=0, type=int,
                         help='mtcnn option, 1 means using R+O, 0 means detect from begining')
