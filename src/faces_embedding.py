@@ -1,4 +1,5 @@
 import sys
+
 sys.path.append('../insightface/deploy')
 sys.path.append('../insightface/src/common')
 
@@ -42,17 +43,29 @@ knownNames = []
 # Initialize the total number of faces processed
 total = 0
 
+
+def resize_to_input_size(image):
+    height, width, channels = image.shape
+    if height != 112:
+        image = cv2.resize(image, (112, height))
+    if width != 112:
+        image = cv2.resize(image, (112, 112))
+    return image
+
+
 # Loop over the imagePaths
 for (i, imagePath) in enumerate(imagePaths):
     # extract the person name from the image path
-    print("[INFO] processing image {}/{}".format(i+1, len(imagePaths)))
+    print("[INFO] processing image {}/{}".format(i + 1, len(imagePaths)))
     name = imagePath.split(os.path.sep)[-2]
 
     # load the image
     image = cv2.imread(imagePath)
     # convert face to RGB color
+    image = resize_to_input_size(image)
+
     nimg = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    nimg = np.transpose(nimg, (2,0,1))
+    nimg = np.transpose(nimg, (2, 0, 1))
     # Get the face embedding vector
     face_embedding = embedding_model.get_feature(nimg)
 
@@ -61,6 +74,7 @@ for (i, imagePath) in enumerate(imagePaths):
     knownNames.append(name)
     knownEmbeddings.append(face_embedding)
     total += 1
+
 
 print(total, " faces embedded")
 
