@@ -1,10 +1,11 @@
 import sys
 
+from Facer.FacialDetector import FacialDetector
+
 sys.path.append('../insightface/deploy')
 sys.path.append('../insightface/src/common')
 
 from imutils import paths
-import face_preprocess
 import numpy as np
 import face_model
 import argparse
@@ -52,6 +53,7 @@ def resize_to_input_size(image):
         image = cv2.resize(image, (112, 112))
     return image
 
+facial_detector = FacialDetector()
 
 # Loop over the imagePaths
 for (i, imagePath) in enumerate(imagePaths):
@@ -61,11 +63,16 @@ for (i, imagePath) in enumerate(imagePaths):
 
     # load the image
     image = cv2.imread(imagePath)
+
+    # Get only the cropped face image
+    image = facial_detector.get_single_cropped_face(image)
+
     # convert face to RGB color
     image = resize_to_input_size(image)
 
     nimg = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     nimg = np.transpose(nimg, (2, 0, 1))
+
     # Get the face embedding vector
     face_embedding = embedding_model.get_feature(nimg)
 

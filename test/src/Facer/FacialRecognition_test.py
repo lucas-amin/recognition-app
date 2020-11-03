@@ -22,11 +22,6 @@ class FacialRecognition():
     texts = []
     frames = 0
 
-    #{OSError}Failed to interpret file <_io.BufferedReader name='/home/lucas/anaconda3/envs/insightface/lib/python3.6/site-packages/mtcnn/data/mtcnn_weights.npy'> as a pickle
-    # <_io.BufferedReader name='/home/lucas/anaconda3/envs/insightface/lib/python3.6/site-packages/mtcnn/data/mtcnn_weights.npy'>
-
-    #
-    # <_io.BufferedReader name='/home/lucas/anaconda3/envs/insightface/lib/python3.6/site-packages/mtcnn/data/mtcnn_weights.npy'>
     def __init__(self, facer):
         self.facer = facer
         self.args = facer.args
