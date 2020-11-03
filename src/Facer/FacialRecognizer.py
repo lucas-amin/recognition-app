@@ -37,7 +37,7 @@ class FacialRecognizer():
 
         # Initialize faces embedding model
         self.embedding_model = insightface.model_zoo.get_model('arcface_r100_v1')
-        self.embedding_model.prepare(ctx_id=-1)
+        self.embedding_model.prepare(ctx_id=0)
 
         # Load the classifier model, determine if face is known
         self.model = load_model(self.args.mymodel)
@@ -49,6 +49,7 @@ class FacialRecognizer():
 
     def reset(self):
         self.embedding_model = insightface.model_zoo.get_model('arcface_r100_v1')
+        self.embedding_model.prepare(ctx_id=0)
 
     def recognize_threadsafe(self, frame):
         with self.__Session.as_default():
@@ -58,16 +59,16 @@ class FacialRecognizer():
         return frame, result
 
     def recognize(self, frame):
-        faces_bboxes, landmarks = self.facial_detector.get_faces_bboxes(frame)
+        faces_bboxes = self.facial_detector.get_faces_bboxes(frame)
         result = []
 
         if len(faces_bboxes) != 0:
             for bbox in faces_bboxes:
-                # preprocessed_image = self.preprocess(frame, bboxe['box'], bboxe['keypoints'])
-                x1, y1, w, h = int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3])
-                output_frame = frame[y1:y1 + h, x1:x1 + w]
+                x, y, w, h = int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3])
+                output_frame = frame[y:y + h, x:x + w]
 
                 # Extract features from face
+                output_frame = cv2.resize(output_frame, (112, 112))
                 embedding = self.embedding_model.get_embedding(output_frame)
 
                 # Predict class from recognition model
@@ -78,9 +79,9 @@ class FacialRecognizer():
 
                 result.append({"name": name, "probability": probability, "bbbox": bbox})
 
-                y = bbox[1] - 10 if bbox[1] - 10 > 10 else bbox[1] + 10
-                cv2.putText(frame, name, (bbox[0], y), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
-                cv2.rectangle(frame, (bbox[0], bbox[1]), (bbox[2], bbox[3]), (255, 0, 0), 2)
+                y = int(y - 10 if y - 10 > 10 else y + 10)
+                cv2.putText(frame, name, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
+                cv2.rectangle(frame, (x, y), (w, h), (255, 0, 0), 2)
 
         return frame, result
 

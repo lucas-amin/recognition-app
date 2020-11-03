@@ -4,22 +4,16 @@ class FacialDetector():
     def __init__(self):
         # Initialize detector
         self.detector = insightface.model_zoo.get_model('retinaface_r50_v1')
-        self.detector.prepare(ctx_id=-1, nms=0.4)
+        self.detector.prepare(ctx_id=0, nms=0.4)
         self.DETECTION_THRESHOLD = 0.5
-
-        # bboxes, landmark = retinaface_detector.detect(frame, threshold=0.5, scale=1.0)
-        # detect_tock = time.time()
-        #
-        # if len(bboxes) != 0:
-        #     reco_tick = time.time()
-        #     for bboxe in bboxes:
-        #         x1, y1, w, h = int(bboxe[0]), int(bboxe[1]), int(bboxe[2]), int(bboxe[3])
-        #         img = frame[y1:y1 + h, x1:x1 + w]
-        #
-        #         img = cv2.resize(img, (112, 112))
 
     def get_faces_bboxes(self, frame):
         faces_bboxes, landmarks = self.detector.detect(frame, threshold=self.DETECTION_THRESHOLD, scale=1.0)
+        faces_bboxes[0][0] = int(faces_bboxes[0][0])
+        faces_bboxes[0][1] = int(faces_bboxes[0][1])
+        faces_bboxes[0][2] = int(faces_bboxes[0][2])
+        faces_bboxes[0][3] = int(faces_bboxes[0][3])
+
         return faces_bboxes
 
     def get_single_cropped_face(self, frame):

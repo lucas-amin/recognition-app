@@ -22,26 +22,21 @@ class Tracker():
         results = []
 
         if frame_number % self.track_frames == 0:
-            print("shape" + str(frame.shape))
-
             bboxes = self.recognizer.facial_detector.get_faces_bboxes(frame)
             self.trackers = []
             self.texts = []
 
             if len(bboxes) != 0:
-                for bboxe in bboxes:
-                    bbox = bboxe['box']
-                    bbox = np.array([bbox[0], bbox[1], bbox[0] + bbox[2], bbox[1] + bbox[3]])
-
-                    landmarks = bboxe['keypoints']
-
-                    nimg = self.recognizer.preprocess(frame, bbox, landmarks)
+                for bbox in bboxes:
+                    # preprocessed_image = self.preprocess(frame, bboxe['box'], bboxe['keypoints'])
+                    x1, y1, w, h = int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3])
+                    output_frame = frame[y1:y1 + h, x1:x1 + w]
 
                     # Extract features from face
-                    embedding = self.recognizer.embedding_model.get_feature(nimg).reshape(1, -1)
+                    embedding = self.recognizer.embedding_model.get_embedding(output_frame)
 
-                    # Predict class
-                    preds = self.recognizer.classifier_model.predict(embedding)
+                    # Predict class from recognition model
+                    preds = self.recognizer.model.predict(embedding)
                     preds = preds.flatten()
 
                     name, probability = self.recognizer.check_prediction(preds, embedding)

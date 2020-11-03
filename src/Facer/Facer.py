@@ -33,14 +33,14 @@ class Facer:
         self.facial_recognizer.reset()
 
     def recognize_with_tracking(self, frame, frame_id):
-        result, result_frame = self.tracker.track(frame, frame_id)
+        frame, result = self.tracker.track(frame, frame_id)
 
-        return result, result_frame
+        return frame, result
 
     def recognize_without_tracking(self, frame):
-        result, result_frame = self.facial_recognizer.recognize(frame)
+        frame, result = self.facial_recognizer.recognize(frame)
 
-        return result, result_frame
+        return frame, result
 
     def recognize_without_tracking_threadsafe(self, frame):
         frame, result = self.facial_recognizer.recognize_threadsafe(frame)
