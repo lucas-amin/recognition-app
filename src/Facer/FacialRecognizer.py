@@ -1,5 +1,7 @@
 import sys
 
+from src.Facer.FacialDetector import FacialDetector
+
 sys.path.append('../insightface/deploy')
 sys.path.append('../insightface/src/common')
 
@@ -36,7 +38,7 @@ class FacialRecognizer():
         self.labels = self.le.fit_transform(self.data['names'])
 
         # Initialize detector
-        self.detector = MTCNN()
+        self.facial_detector = FacialDetector()
 
         # Initialize faces embedding model
         self.embedding_model = face_model.FaceModel(self.args)
@@ -60,7 +62,7 @@ class FacialRecognizer():
         return frame, result
 
     def recognize(self, frame):
-        faces_bboxes = self.detector.detect_faces(frame)
+        faces_bboxes = self.facial_detector.get_faces_bboxes(frame)
         result = []
 
         if len(faces_bboxes) != 0:
