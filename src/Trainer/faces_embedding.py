@@ -1,13 +1,8 @@
-import sys
+import sys    def get
 
 import insightface
-from src.Facer.FacialDetector import FacialDetector
-
-sys.path.append('../insightface/deploy')
-sys.path.append('../insightface/src/common')
-
+from src.Classifier.FacialDetector import FacialDetector
 from imutils import paths
-import numpy as np
 import argparse
 import pickle
 import cv2

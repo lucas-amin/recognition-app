@@ -5,7 +5,7 @@ import time
 
 import cv2
 
-from src.Facer.Facer import Facer
+from src.Classifier.Facer import Facer
 sys.path.append('../insightface/deploy')
 sys.path.append('../insightface/src/common')
 

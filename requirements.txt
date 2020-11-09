@@ -10,3 +10,6 @@ mtcnn
 tensorflow-gpu
 pandas
 joblib
+# test
+pytest==3.6.1
+pillow

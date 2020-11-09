@@ -1,4 +1,4 @@
-from Facer.Facer import Facer
+from Classifier.Facer import Facer
 import cv2
 
 facer = Facer.getAndResetFacerObject()
