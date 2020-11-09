@@ -115,7 +115,7 @@ while True:
                 landmarks = np.array([landmarks["left_eye"][0], landmarks["right_eye"][0], landmarks["nose"][0], landmarks["mouth_left"][0], landmarks["mouth_right"][0],
                                      landmarks["left_eye"][1], landmarks["right_eye"][1], landmarks["nose"][1], landmarks["mouth_left"][1], landmarks["mouth_right"][1]])
                 landmarks = landmarks.reshape((2,5)).T
-                nimg = face_preprocess.preprocess(frame, bbox, landmarks, image_size='112,112')
+                nimg = face_preprocess.transpose_face(frame, bbox, landmarks, image_size='112,112')
                 nimg = cv2.cvtColor(nimg, cv2.COLOR_BGR2RGB)
                 nimg = np.transpose(nimg, (2,0,1))
                 embedding = embedding_model.get_feature(nimg).reshape(1,-1)

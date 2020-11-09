@@ -7,14 +7,15 @@ class FacialDetector():
         self.detector.prepare(ctx_id=0, nms=0.4)
         self.DETECTION_THRESHOLD = 0.5
 
-    def get_faces_bboxes(self, frame):
-        faces_bboxes, landmarks = self.detector.detect(frame, threshold=self.DETECTION_THRESHOLD, scale=1.0)
-        faces_bboxes[0][0] = int(faces_bboxes[0][0])
-        faces_bboxes[0][1] = int(faces_bboxes[0][1])
-        faces_bboxes[0][2] = int(faces_bboxes[0][2])
-        faces_bboxes[0][3] = int(faces_bboxes[0][3])
+    def get_faces_bbox_and_landmarks(self, frame):
+        detection_result, landmarks = self.detector.detect(frame, threshold=self.DETECTION_THRESHOLD, scale=1.0)
 
-        return faces_bboxes
+        faces_bboxes = []
+        for face_bbox in detection_result:
+            int_bbox = int(face_bbox[0]), int(face_bbox[1]), int(face_bbox[2]), int(face_bbox[3])
+            faces_bboxes.append(int_bbox)
+
+        return faces_bboxes, landmarks
 
     def get_single_cropped_face(self, frame):
         bbox_dict, landmarks = self.detector.detect(frame, threshold=0.5, scale=1.0)

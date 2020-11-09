@@ -11,7 +11,7 @@ frame_id = 0
 while status is True:
     status, frame = cap.read()
 
-    frame, result = facer.recognize_without_tracking(frame)
+    frame, result = facer.recognize_with_tracking(frame)
 
     cv2.imshow("result_frame", frame)
     cv2.waitKey(1)

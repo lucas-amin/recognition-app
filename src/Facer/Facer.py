@@ -9,7 +9,6 @@ class Facer:
     def __init__(self):
         self.args = Facer.parse_arguments()
         self.facial_recognizer = FacialRecognizer(self)
-        self.tracker = Tracker(self)
         self.frame_id = 0
 
     @staticmethod
@@ -29,11 +28,10 @@ class Facer:
         return Facer.facer_object
 
     def reset(self):
-        self.tracker.reset()
         self.facial_recognizer.reset()
 
-    def recognize_with_tracking(self, frame, frame_id):
-        frame, result = self.tracker.track(frame, frame_id)
+    def recognize_with_tracking(self, frame):
+        frame, result = self.facial_recognizer.recognize_with_tracking(frame)
 
         return frame, result
 
