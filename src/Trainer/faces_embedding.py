@@ -1,5 +1,4 @@
-import sys    def get
-
+import sys
 import insightface
 from src.Classifier.FacialDetector import FacialDetector
 from imutils import paths
@@ -65,7 +64,7 @@ for (i, imagePath) in enumerate(imagePaths):
     image = resize_to_input_size(image)
 
     # Get the face embedding vector
-    face_embedding = embedding_model.get_embedding(image)
+    face_embedding = embedding_model.get_face_embedding(image)
 
     # add the name of the person + corresponding face
     # embedding to their respective list

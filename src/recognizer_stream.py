@@ -1,7 +1,7 @@
 from Classifier.Facer import Facer
 import cv2
 
-facer = Facer.getAndResetFacerObject()
+facer = Facer.get_and_reset_facer_object()
 
 cap = cv2.VideoCapture(1)
 

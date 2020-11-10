@@ -1,7 +1,8 @@
+import os
+
 import insightface
 
 from src.Classifier.FacialDetector import FacialDetector
-
 from keras.models import load_model
 import cv2
 from keras import backend as K
@@ -9,9 +10,10 @@ import tensorflow as tf
 
 from src.Classifier.SoftmaxResultChecker import SoftmaxResultChecker
 from src.Classifier.Tracker import Tracker
+from src.Trainer.SoftmaxClassifier import SoftmaxClassifierBuilder
 
 
-class FacialRecognizer():
+class FacialRecognizer:
     # Initialize some useful arguments
     trackers = []
     texts = []
@@ -31,7 +33,7 @@ class FacialRecognizer():
         self.embedding_model = FacialRecognizer.get_embedding_model()
 
         # Load the classifier model, determine if face is known
-        self.softmax_model = load_model(self.args.mymodel)
+        self.softmax_model = SoftmaxClassifierBuilder.get_classifier_from_file("./outputs/my_model.h5")
 
         self.clean_tf_graph()
 
@@ -126,3 +128,4 @@ class FacialRecognizer():
         y = int(y - 10 if y - 10 > 10 else y + 10)
         cv2.putText(frame, name, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
         cv2.rectangle(frame, (x, y), (w, h), (255, 0, 0), 2)
+
