@@ -1,18 +1,18 @@
-import os
 import pickle
-
 from keras.engine.saving import load_model
 from keras.layers import Dense, Dropout
 from keras.models import Sequential
 from keras.optimizers import Adam
 import keras
 
+from src.file_utils import get_absolute_path
+
 
 class SoftmaxClassifierBuilder:
-    DEFAULT_MODEL_PATH = "outputs/my_model.h5"
-    DEFAULT_ENCODER_PATH = "outputs/le.pickle"
-    TEST_MODEL_PATH = "outputs/my_test_model.h5"
-    TEST_ENCODER_PATH = "outputs/le_test.pickle"
+    DEFAULT_MODEL_PATH = get_absolute_path("Trainer/outputs/my_model.h5")
+    DEFAULT_ENCODER_PATH = get_absolute_path("Trainer/outputs/le.pickle")
+    TEST_MODEL_PATH = get_absolute_path("Trainer/outputs/my_test_model.h5")
+    TEST_ENCODER_PATH = get_absolute_path("Trainer/outputs/le_test.pickle")
 
     def __init__(self, input_shape, num_classes):
         self.input_shape = input_shape
@@ -47,6 +47,6 @@ class SoftmaxClassifierBuilder:
 
     @staticmethod
     def get_classifier_from_file(softmax_model_path):
-        corrected_model_path = os.path.join(os.path.dirname(__file__), softmax_model_path)
+        corrected_model_path = get_absolute_path(softmax_model_path)
         classifier = load_model(corrected_model_path)
         return classifier

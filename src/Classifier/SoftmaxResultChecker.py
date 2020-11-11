@@ -1,6 +1,9 @@
+import os
 import pickle
 
 import numpy as np
+
+from src.file_utils import get_absolute_path
 
 
 class SoftmaxResultChecker:
@@ -8,18 +11,19 @@ class SoftmaxResultChecker:
     proba_threshold = 0.85
     comparing_num = 5
 
-    def __init__(self, args):
-        self.args = args
-
+    def __init__(self):
         # Load embeddings and labels
-        self.data = pickle.loads(open(self.args.embeddings, "rb").read())
-        self.le = pickle.loads(open(self.args.le, "rb").read())
+        embedding_path = get_absolute_path("Trainer/outputs/embeddings.pickle")
+        self.data = pickle.loads(open(embedding_path, "rb").read())
+        le_path = get_absolute_path("Trainer/outputs/le.pickle")
+        self.le = pickle.loads(open(le_path, "rb").read())
 
         self.embeddings = np.array(self.data['embeddings'])
         self.labels = self.le.fit_transform(self.data['names'])
 
     def check_prediction(self, preds, embedding):
         # Get the highest accuracy embedded vector
+        preds = preds.flatten()
         predicted_index = np.argmax(preds)
         highest_probability = preds[predicted_index]
 

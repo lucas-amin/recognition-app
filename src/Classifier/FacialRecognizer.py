@@ -10,7 +10,7 @@ import tensorflow as tf
 
 from src.Classifier.SoftmaxResultChecker import SoftmaxResultChecker
 from src.Classifier.Tracker import Tracker
-from src.Trainer.SoftmaxClassifier import SoftmaxClassifierBuilder
+from src.Trainer.SoftmaxClassifierBuilder import SoftmaxClassifierBuilder
 
 
 class FacialRecognizer:
@@ -21,10 +21,9 @@ class FacialRecognizer:
 
     def __init__(self, facer):
         self.facer = facer
-        self.args = facer.args
         self.tracker = Tracker()
 
-        self.result_checker = SoftmaxResultChecker(self.args)
+        self.result_checker = SoftmaxResultChecker()
 
         # Initialize detector
         self.facial_detector = FacialDetector()
@@ -107,7 +106,6 @@ class FacialRecognizer:
     def get_face_name(self, output_frame):
         embedding = self.embedding_model.get_embedding(output_frame)
         preds = self.softmax_model.predict(embedding)
-        preds = preds.flatten()
         name, probability = self.result_checker.check_prediction(preds, embedding)
         return name, probability
 

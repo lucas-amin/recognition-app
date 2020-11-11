@@ -6,15 +6,16 @@ from imutils import paths
 from src.Classifier.FacePreprocesser import FacePreprocesser
 from src.Classifier.FacialDetector import FacialDetector
 from src.Classifier.FacialRecognizer import FacialRecognizer
+from src.file_utils import get_absolute_path
 
 
 class DatasetFeaturesReader:
     def __init__(self):
         # Grab the paths to the input images in our dataset
         print("[INFO] quantifying faces...")
-        training_directory = "../../datasets/train"
+        training_directory = get_absolute_path("../datasets/train")
         self.imagePaths = list(paths.list_images(training_directory))
-        self.embedding_path = os.path.join(os.path.dirname(__file__), "./outputs/")
+        self.embedding_path = get_absolute_path("Trainer/outputs/")
         self.embedding_filename = "embeddings.pickle"
 
         # Initialize the faces embedding model
@@ -27,6 +28,18 @@ class DatasetFeaturesReader:
         # Initialize the total number of faces processed
         self.registered_faces = 0
         self.facial_detector = FacialDetector()
+
+    def get_dataset_faces(self):
+        images = []
+        for (i, imagePath) in enumerate(self.imagePaths):
+            # extract the person name from the image path
+            name = imagePath.split(os.path.sep)[-2]
+
+            image = cv2.imread(imagePath)
+
+            images.append({"label": name, "image": image})
+
+        return images
 
     def extract_features_from_dataset(self):
         for (i, imagePath) in enumerate(self.imagePaths):

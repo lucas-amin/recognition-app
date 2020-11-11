@@ -2,7 +2,7 @@ from sklearn.model_selection import KFold
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 import numpy as np
 from src.Trainer.DatasetFeaturesReader import DatasetFeaturesReader
-from src.Trainer.SoftmaxClassifier import SoftmaxClassifierBuilder
+from src.Trainer.SoftmaxClassifierBuilder import SoftmaxClassifierBuilder
 
 
 class RecognitionTrainer:
@@ -11,17 +11,22 @@ class RecognitionTrainer:
     EPOCHS = 25
 
     def __init__(self):
-        pass
+        self.features_reader = None
 
     def load_dataset(self):
         self.load_labels()
         self.setup_classifier()
 
     def load_labels(self):
-        self.features_reader = DatasetFeaturesReader()
-        self.features_reader.extract_features_from_dataset()
+        self.features_reader = self.get_features_reader()
 
         self.encode_labels()
+
+    def get_features_reader(self):
+        if self.features_reader is None:
+            self.features_reader = DatasetFeaturesReader()
+            self.features_reader.extract_features_from_dataset()
+        return self.features_reader
 
     def encode_labels(self):
         # Encode the labels
