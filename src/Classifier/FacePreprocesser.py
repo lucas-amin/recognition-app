@@ -56,15 +56,6 @@ class FacePreprocesser:
         return img
 
     @staticmethod
-    def resize_to_input_size(image):
-        height, width, channels = image.shape
-        if height != 112:
-            image = cv2.resize(image, (112, height))
-        if width != 112:
-            image = cv2.resize(image, (112, 112))
-        return image
-
-    @staticmethod
     def preprocess(img, bbox=None, landmark=None, **kwargs):
         if isinstance(img, str):
             img = FacePreprocesser.read_image(img, **kwargs)

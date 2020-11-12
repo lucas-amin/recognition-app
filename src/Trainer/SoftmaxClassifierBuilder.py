@@ -32,21 +32,25 @@ class SoftmaxClassifierBuilder:
         return self.model
 
     def save_default_model(self):
-        # write the face recognition model to output
         self.model.save(self.DEFAULT_MODEL_PATH)
         f = open(self.DEFAULT_ENCODER_PATH, "wb")
         f.write(pickle.dumps(self.DEFAULT_ENCODER_PATH))
         f.close()
 
     def save_testing_model(self):
-        # write the face recognition model to output
         self.model.save(self.TEST_MODEL_PATH)
         f = open(self.TEST_ENCODER_PATH, "wb")
         f.write(pickle.dumps(self.TEST_ENCODER_PATH))
         f.close()
 
     @staticmethod
-    def get_classifier_from_file(softmax_model_path):
+    def load_default_classifier():
+        corrected_model_path = get_absolute_path(SoftmaxClassifierBuilder.DEFAULT_MODEL_PATH)
+        classifier = load_model(corrected_model_path)
+        return classifier
+
+    @staticmethod
+    def load_classifier_from_file(softmax_model_path):
         corrected_model_path = get_absolute_path(softmax_model_path)
         classifier = load_model(corrected_model_path)
         return classifier

@@ -6,6 +6,7 @@ from imutils import paths
 from src.Classifier.FacePreprocesser import FacePreprocesser
 from src.Classifier.FacialDetector import FacialDetector
 from src.Classifier.FacialRecognizer import FacialRecognizer
+from src.Classifier.face_embedding_extractor import FaceEmbeddingExtractor
 from src.file_utils import get_absolute_path
 
 
@@ -19,7 +20,7 @@ class DatasetFeaturesReader:
         self.embedding_filename = "embeddings.pickle"
 
         # Initialize the faces embedding model
-        self.embedding_model = FacialRecognizer.get_embedding_model()
+        self.embedding_extractor = FaceEmbeddingExtractor()
 
         # Initialize our lists of extracted facial embeddings and corresponding people names
         self.known_embeddings = []
@@ -95,7 +96,6 @@ class DatasetFeaturesReader:
 
     def get_face_embedding(self, image):
         image = self.facial_detector.get_single_cropped_face(image)
-        image = FacePreprocesser.resize_to_input_size(image)
-        face_embedding = self.embedding_model.get_embedding(image)
+        face_embedding = self.embedding_extractor.get_embedding(image)
         return face_embedding
 

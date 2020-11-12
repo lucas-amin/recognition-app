@@ -10,6 +10,7 @@ import tensorflow as tf
 
 from src.Classifier.SoftmaxResultChecker import SoftmaxResultChecker
 from src.Classifier.Tracker import Tracker
+from src.Classifier.face_embedding_extractor import FaceEmbeddingExtractor
 from src.Trainer.SoftmaxClassifierBuilder import SoftmaxClassifierBuilder
 
 
@@ -29,23 +30,12 @@ class FacialRecognizer:
         self.facial_detector = FacialDetector()
 
         # Initialize faces embedding model
-        self.embedding_model = FacialRecognizer.get_embedding_model()
+        self.embedding_model = FaceEmbeddingExtractor()
 
         # Load the classifier model, determine if face is known
-        self.softmax_model = SoftmaxClassifierBuilder.get_classifier_from_file("./outputs/my_model.h5")
+        self.softmax_model = SoftmaxClassifierBuilder.load_classifier_from_file("./outputs/my_model.h5")
 
         self.clean_tf_graph()
-
-    @staticmethod
-    def get_embedding_model(use_gpu=True):
-        embedding_model = insightface.model_zoo.get_model('arcface_r100_v1')
-
-        if use_gpu:
-            embedding_model.prepare(ctx_id=0)
-        else:
-            embedding_model.prepare(ctx_id=-1)
-
-        return embedding_model
 
     def clean_tf_graph(self):
         # Clean up tensorflow graph
@@ -53,7 +43,7 @@ class FacialRecognizer:
         self.__Graph = tf.get_default_graph()
 
     def reset(self):
-        self.embedding_model = FacialRecognizer.get_embedding_model()
+        self.embedding_model.reset()
         self.tracker.reset()
 
     def recognize_threadsafe(self, frame):

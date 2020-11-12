@@ -15,7 +15,7 @@ def test_recognition_trainer():
     faces_dict = features_reader.get_dataset_faces()
     result_checker = SoftmaxResultChecker()
 
-    classifier = SoftmaxClassifierBuilder.get_classifier_from_file(SoftmaxClassifierBuilder.TEST_MODEL_PATH)
+    classifier = SoftmaxClassifierBuilder.load_classifier_from_file(SoftmaxClassifierBuilder.TEST_MODEL_PATH)
 
     for face_dict in faces_dict:
         face = face_dict["image"]
