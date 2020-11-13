@@ -1,30 +1,23 @@
-from src.Classifier.SoftmaxResultChecker import SoftmaxResultChecker
-from src.Trainer.RecognitionTrainer import RecognitionTrainer
-from src.Trainer.SoftmaxClassifierBuilder import SoftmaxClassifierBuilder
+from src.Classifier.SoftmaxModelTrainer import SoftmaxModelTrainer
+from src.Classifier.face_embedding_extractor import FaceEmbeddingExtractor
+from test.tests_image_manager import TestsImageManager
 
+CPU_PROCESS_FRAMES_NUMBER = 30
+embedding_extractor = FaceEmbeddingExtractor(use_gpu=True)
+image_manager = TestsImageManager()
 
 def test_recognition_trainer():
-    trainer = RecognitionTrainer()
+    trainer = SoftmaxModelTrainer()
+    model = trainer.train_and_get_model_with_test_dataset()
+    trainer.save_results()
 
-    trainer.load_dataset()
-    trainer.train()
-    trainer.save_test_results()
+    image_dict, names = image_manager.get_testing_dataset_dict()
 
-    features_reader = trainer.get_features_reader()
+    for name in names:
+        image_list = image_dict[name][:CPU_PROCESS_FRAMES_NUMBER]
 
-    faces_dict = features_reader.get_dataset_faces()
-    result_checker = SoftmaxResultChecker()
+        for image in image_list:
+            embedding = embedding_extractor.get_face_embedding(image)
+            result = model.predict(embedding)
+            assert len(result) == len(name)
 
-    classifier = SoftmaxClassifierBuilder.load_classifier_from_file(SoftmaxClassifierBuilder.TEST_MODEL_PATH)
-
-    for face_dict in faces_dict:
-        face = face_dict["image"]
-
-        embedding = features_reader.get_face_embedding(face)
-
-        prediction = classifier.predict(embedding)
-        name, highest_probability = result_checker.check_prediction(prediction, embedding)
-
-        print(name, highest_probability)
-
-    assert False

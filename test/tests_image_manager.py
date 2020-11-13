@@ -7,7 +7,7 @@ class TestsImageManager:
     def __init__(self):
         self.path = get_absolute_path("./test/UnitTestsImages/")
 
-    def get_testing_dataset_images(self):
+    def get_testing_dataset_dict(self):
         names = os.listdir(self.path)
         image_dict = {}
 
@@ -15,7 +15,7 @@ class TestsImageManager:
             image_names = os.listdir(self.path + name)
             self.get_folder_images(image_dict, image_names, name)
 
-        return image_dict
+        return image_dict, names
 
     def get_folder_images(self, image_dict, image_names, name):
         image_dict[name] = []

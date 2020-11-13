@@ -1,9 +1,4 @@
-import os
-
-import insightface
-
 from src.Classifier.FacialDetector import FacialDetector
-from keras.models import load_model
 import cv2
 from keras import backend as K
 import tensorflow as tf
@@ -11,7 +6,7 @@ import tensorflow as tf
 from src.Classifier.SoftmaxResultChecker import SoftmaxResultChecker
 from src.Classifier.Tracker import Tracker
 from src.Classifier.face_embedding_extractor import FaceEmbeddingExtractor
-from src.Trainer.SoftmaxClassifierBuilder import SoftmaxClassifierBuilder
+from src.Trainer.softmax_classifier_loader import SoftmaxFileManager
 
 
 class FacialRecognizer:
@@ -26,14 +21,11 @@ class FacialRecognizer:
 
         self.result_checker = SoftmaxResultChecker()
 
-        # Initialize detector
         self.facial_detector = FacialDetector()
 
-        # Initialize faces embedding model
         self.embedding_model = FaceEmbeddingExtractor()
 
-        # Load the classifier model, determine if face is known
-        self.softmax_model = SoftmaxClassifierBuilder.load_classifier_from_file("./outputs/my_model.h5")
+        self.softmax_model = SoftmaxFileManager.load_default_classifier()
 
         self.clean_tf_graph()
 
@@ -43,7 +35,6 @@ class FacialRecognizer:
         self.__Graph = tf.get_default_graph()
 
     def reset(self):
-        self.embedding_model.reset()
         self.tracker.reset()
 
     def recognize_threadsafe(self, frame):
@@ -94,7 +85,7 @@ class FacialRecognizer:
         return frame, results
 
     def get_face_name(self, output_frame):
-        embedding = self.embedding_model.get_embedding(output_frame)
+        embedding = self.embedding_model.get_face_embedding(output_frame)
         preds = self.softmax_model.predict(embedding)
         name, probability = self.result_checker.check_prediction(preds, embedding)
         return name, probability

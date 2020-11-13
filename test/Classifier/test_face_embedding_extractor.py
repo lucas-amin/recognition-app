@@ -3,17 +3,29 @@ from test.tests_image_manager import TestsImageManager
 
 
 def test_face_embedding_extractor():
-    embedding_extractor = FaceEmbeddingExtractor()
+    CPU_PROCESS_FRAMES_NUMBER = 30
+    embedding_extractor = FaceEmbeddingExtractor(use_gpu=False)
     image_manager = TestsImageManager()
-    image_dict = image_manager.get_testing_dataset_images()
-    names = image_dict.keys()
+    image_dict, names = image_manager.get_testing_dataset_dict()
+
+    for name in names:
+        image_list = image_dict[name][:CPU_PROCESS_FRAMES_NUMBER]
+
+        for image in image_list:
+            embedding = embedding_extractor.get_embedding(image)
+            assert len(embedding) == 1
+            assert len(embedding[0]) == 512
+
+def test_gpu_face_embedding_extractor():
+    embedding_extractor = FaceEmbeddingExtractor(use_gpu=True)
+
+    image_manager = TestsImageManager()
+    image_dict, names = image_manager.get_testing_dataset_dict()
 
     for name in names:
         image_list = image_dict[name]
 
         for image in image_list:
             embedding = embedding_extractor.get_embedding(image)
-            assert len(embedding) == 512
-
-def get_embedding_test():
-    pass
+            assert len(embedding) == 1
+            assert len(embedding[0]) == 512

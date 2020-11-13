@@ -10,9 +10,9 @@ class SoftmaxResultChecker:
 
     def __init__(self):
         # Load embeddings and labels
-        embedding_path = get_absolute_path("Trainer/outputs/embeddings.pickle")
+        embedding_path = get_absolute_path("src/Trainer/outputs/embeddings.pickle")
         self.data = pickle.loads(open(embedding_path, "rb").read())
-        le_path = get_absolute_path("Trainer/outputs/le.pickle")
+        le_path = get_absolute_path("src/Trainer/outputs/le.pickle")
         self.le = pickle.loads(open(le_path, "rb").read())
 
         self.embeddings = np.array(self.data['embeddings'])
@@ -38,7 +38,8 @@ class SoftmaxResultChecker:
         name = "unknown"
 
         # Set name as the highest probable person if it passes threshold
-        if cos_similarity < SoftmaxResultChecker.cosine_threshold and highest_probability > SoftmaxResultChecker.proba_threshold:
+        if cos_similarity < SoftmaxResultChecker.cosine_threshold and \
+                highest_probability > SoftmaxResultChecker.proba_threshold:
             name = self.le.classes_[predicted_index]
 
         return name, highest_probability
