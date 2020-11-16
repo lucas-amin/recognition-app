@@ -51,7 +51,7 @@ class EmbeddingManager:
 
         return self.known_embeddings, self.known_names
 
-    def load_test_embeddings(self):
+    def load_or_create_embeddings_if_inexistent(self):
         if self.testing_embedding_file_exists():
             self.known_embeddings, self.known_names = self.load_embeddings_from_files(self.test_embedding_path)
         else:

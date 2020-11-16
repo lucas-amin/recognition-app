@@ -1,22 +1,20 @@
 import sys
-
 from pandas import np
-
+from test.tests_image_manager import TestsImageManager
 sys.path.insert(1, '../src/')
-
-import cv2
-import pytest
 from camera import VideoCamera
 
-
-images = ["arya-bran.jpeg", "daenerys-jon_snow.jpeg", "daenerys-jon_snow-cersei.jpg", "unknown.jpg"]
-@pytest.mark.parametrize("img_name", images)
-def test_convert_numpymatrix_to_base64(img_name):
+def test_convert_numpymatrix_to_base64():
     camera = VideoCamera()
-    frame = cv2.imread("../data/" + img_name)
+    imagemanager = TestsImageManager()
 
-    base64_frame = camera.convert_numpymatrix_to_base64_string(frame)
+    image_dict, names = imagemanager.get_testing_dataset_dict()
 
-    decoded = camera.convert_base64bytes_to_numpymatrix(base64_frame)
+    for name in names:
+        list_image = image_dict[name]
 
-    assert np.array_equal(decoded, frame)
+        for image in list_image:
+            base64_frame = camera.convert_numpymatrix_to_base64_string(image)
+            decoded = camera.convert_base64bytes_to_numpymatrix(base64_frame)
+
+            assert np.array_equal(decoded, image)

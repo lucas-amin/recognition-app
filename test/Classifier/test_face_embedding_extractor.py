@@ -12,7 +12,7 @@ def test_face_embedding_extractor():
         image_list = image_dict[name][:CPU_PROCESS_FRAMES_NUMBER]
 
         for image in image_list:
-            embedding = embedding_extractor.get_embedding(image)
+            embedding = embedding_extractor.get_face_embedding(image)
             assert len(embedding) == 1
             assert len(embedding[0]) == 512
 
@@ -26,6 +26,6 @@ def test_gpu_face_embedding_extractor():
         image_list = image_dict[name]
 
         for image in image_list:
-            embedding = embedding_extractor.get_embedding(image)
+            embedding = embedding_extractor.get_face_embedding(image)
             assert len(embedding) == 1
             assert len(embedding[0]) == 512

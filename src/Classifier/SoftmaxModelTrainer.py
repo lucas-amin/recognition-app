@@ -32,7 +32,7 @@ class SoftmaxModelTrainer:
         self.features_reader = EmbeddingManager()
 
         if dataset is "TEST":
-            self.embeddings, self.labels = self.features_reader.load_test_embeddings()
+            self.embeddings, self.labels = self.features_reader.load_or_create_embeddings_if_inexistent()
             self.dataset = "TEST"
         elif dataset is "DEFAULT":
             self.embeddings, self.labels = self.features_reader.load_default_embeddings()

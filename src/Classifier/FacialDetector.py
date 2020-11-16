@@ -29,15 +29,15 @@ class FacialDetector():
         return faces_bboxes, landmarks
 
     def get_single_cropped_face(self, frame):
-        bbox_dict, landmarks = self.detector.detect(frame, threshold=0.3, scale=1.0)
+        bbox_dict, landmarks = self.detector.detect(frame, threshold=0.4, scale=1.0)
 
-        if len(bbox_dict) >= 1:
+        if len(bbox_dict) == 1:
             bbox = bbox_dict[0]
             x1, y1, w, h = int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3])
             output_frame = frame[y1:y1 + h, x1:x1 + w]
 
         else:
-            print("This frame does not have a face")
-            output_frame = None
+            print("This frame does not have one face")
+            output_frame = frame
 
         return output_frame
