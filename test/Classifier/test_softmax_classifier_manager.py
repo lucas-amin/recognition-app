@@ -1,5 +1,3 @@
-import cv2
-
 from src.Classifier.FacialDetector import FacialDetector
 from src.Classifier.face_embedding_extractor import FaceEmbeddingExtractor
 from src.Classifier.softmax_classifier_manager import SoftmaxClassifierManager
@@ -31,21 +29,10 @@ def test_load_default_softmax_classifier():
     embedding_extractor = FaceEmbeddingExtractor(use_gpu=True)
 
     image_manager = TrainingImagesManager()
-    image_dict, names = image_manager.get_testing_dataset_dict()
+    image_dict, names = image_manager.get_production_dataset_dict()
 
     iterate_manager_on_images(classifier_manager, embedding_extractor, image_dict, names)
 
-
-def test_train_default_softmax_classifier():
-    # classifier_manager = SoftmaxClassifierManager()
-    # classifier_manager.train_default_classifier()
-    # embedding_extractor = FaceEmbeddingExtractor(use_gpu=True)
-    # 
-    # image_manager = TestsImageManager()
-    # image_dict, names = image_manager.get_testing_dataset_dict()
-    # 
-    # iterate_manager_on_images(classifier_manager, embedding_extractor, image_dict, names)
-    pass
 
 def test_train_test_softmax_classifier():
     classifier_manager = SoftmaxClassifierManager()

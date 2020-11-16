@@ -2,27 +2,17 @@ import os
 import cv2
 from src.file_utils import get_absolute_path
 
-class TestsImageManager:
+class TrainingImagesManager:
 
     def __init__(self):
-        self.path = get_absolute_path("./test/UnitTestsImages/")
+        self.path = get_absolute_path("./datasets/production_dataset/")
 
-    def get_testing_dataset_dict(self):
+    def get_production_dataset_dict(self):
         names = os.listdir(self.path)
         image_dict = {}
 
         for name in names:
             image_names = os.listdir(self.path + name)
-            self.get_folder_images(image_dict, image_names, name)
-
-        return image_dict, names
-
-    def get_reduced_testing_dataset_dict(self):
-        names = os.listdir(self.path)
-        image_dict = {}
-
-        for name in names:
-            image_names = os.listdir(self.path + name)[:3]
             self.get_folder_images(image_dict, image_names, name)
 
         return image_dict, names

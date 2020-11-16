@@ -1,4 +1,4 @@
-from src.Classifier.SoftmaxModelTrainer import SoftmaxModelTrainer
+from src.Trainer.SoftmaxModelTrainer import SoftmaxModelTrainer
 from src.Classifier.face_embedding_extractor import FaceEmbeddingExtractor
 from test.tests_image_manager import TestsImageManager
 

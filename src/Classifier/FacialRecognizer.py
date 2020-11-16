@@ -54,7 +54,7 @@ class FacialRecognizer:
 
                 name, probability = self.get_face_name(output_frame)
 
-                result = self.get_result_dict(bbox, frame, name)
+                result = self.get_result_dict(name, probability, bbox)
 
                 self.draw_roi(frame, name, bbox)
                 results.append(result)
@@ -73,7 +73,7 @@ class FacialRecognizer:
 
                     name, probability = self.get_face_name(output_frame)
 
-                    result = self.get_result_dict(bbox, frame, name)
+                    result = self.get_result_dict(name, probability, bbox)
 
                     self.tracker.track_result_frame(name, frame, bbox)
 
