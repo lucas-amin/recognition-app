@@ -1,12 +1,13 @@
 import sys
 from pandas import np
-from test.tests_image_manager import TestsImageManager
+
+from src.Trainer.default_image_manager import DatasetImagesManager
 sys.path.insert(1, '../src/')
 from camera import VideoCamera
 
 def test_convert_numpymatrix_to_base64():
     camera = VideoCamera()
-    imagemanager = TestsImageManager()
+    imagemanager = DatasetImagesManager()
 
     image_dict, names = imagemanager.get_testing_dataset_dict()
 

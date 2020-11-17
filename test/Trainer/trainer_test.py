@@ -1,10 +1,11 @@
 from src.Trainer.SoftmaxModelTrainer import SoftmaxModelTrainer
 from src.Classifier.face_embedding_extractor import FaceEmbeddingExtractor
+from src.Trainer.default_image_manager import DatasetImagesManager
 from test.tests_image_manager import TestsImageManager
 
 CPU_PROCESS_FRAMES_NUMBER = 30
 embedding_extractor = FaceEmbeddingExtractor(use_gpu=True)
-image_manager = TestsImageManager()
+image_manager = DatasetImagesManager()
 
 def test_recognition_trainer():
     trainer = SoftmaxModelTrainer()

@@ -1,8 +1,7 @@
 from src.Classifier.FacialDetector import FacialDetector
 from src.Classifier.face_embedding_extractor import FaceEmbeddingExtractor
 from src.Classifier.softmax_classifier_manager import SoftmaxClassifierManager
-from src.Trainer.default_image_manager import TrainingImagesManager
-from test.tests_image_manager import TestsImageManager
+from src.Trainer.default_image_manager import DatasetImagesManager
 
 
 def iterate_manager_on_images(classifier_manager, embedding_extractor, image_dict, names):
@@ -25,10 +24,10 @@ def iterate_manager_on_images(classifier_manager, embedding_extractor, image_dic
 
 def test_load_default_softmax_classifier():
     classifier_manager = SoftmaxClassifierManager()
-    classifier_manager.load_default_classifier()
+    classifier_manager.load_production_classifier()
     embedding_extractor = FaceEmbeddingExtractor(use_gpu=True)
 
-    image_manager = TrainingImagesManager()
+    image_manager = DatasetImagesManager()
     image_dict, names = image_manager.get_production_dataset_dict()
 
     iterate_manager_on_images(classifier_manager, embedding_extractor, image_dict, names)
@@ -36,10 +35,10 @@ def test_load_default_softmax_classifier():
 
 def test_train_test_softmax_classifier():
     classifier_manager = SoftmaxClassifierManager()
-    classifier_manager.train_test_classifier()
+    classifier_manager.train_unittest_classifier()
     embedding_extractor = FaceEmbeddingExtractor(use_gpu=True)
 
-    image_manager = TestsImageManager()
+    image_manager = DatasetImagesManager()
     image_dict, names = image_manager.get_testing_dataset_dict()
 
     iterate_manager_on_images(classifier_manager, embedding_extractor, image_dict, names)
@@ -47,10 +46,10 @@ def test_train_test_softmax_classifier():
 
 def test_loading_face_embedding_extractor():
     classifier_manager = SoftmaxClassifierManager()
-    classifier_manager.load_test_classifier()
+    classifier_manager.load_unittest_classifier()
     embedding_extractor = FaceEmbeddingExtractor(use_gpu=True)
 
-    image_manager = TestsImageManager()
+    image_manager = DatasetImagesManager()
     image_dict, names = image_manager.get_testing_dataset_dict()
 
     iterate_manager_on_images(classifier_manager, embedding_extractor, image_dict, names)

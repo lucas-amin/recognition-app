@@ -7,6 +7,9 @@ class Facer:
         self.facial_recognizer = FacialRecognizer(self)
         self.frame_id = 0
 
+    def get_classifier(self):
+        return self.facial_recognizer.softmax_classifier_manager
+
     @staticmethod
     def get_facer_object():
         if Facer.facer_object is None:

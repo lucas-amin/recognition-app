@@ -8,39 +8,36 @@ import numpy as np
 from src.Trainer.EmbeddingManager import EmbeddingManager
 from src.Trainer.softmax_classifier_loader import SoftmaxFileManager
 
-
 class SoftmaxModelTrainer:
     # Initialize Softmax training model arguments
     BATCH_SIZE = 64
-    EPOCHS = 25
+    EPOCHS = 10
 
     def __init__(self):
         self.features_reader = None
         self.dataset = None
 
-    def train_and_get_model_with_default_dataset(self):
-        embeddings, labels = self.get_and_load_embeddings(dataset="DEFAULT")
-        model = self.train_and_get_model(embeddings, labels)
-        return model
-
-    def train_and_get_model_with_test_dataset(self):
-        embeddings, labels = self.get_and_load_embeddings(dataset="TEST")
-        model = self.train_and_get_model(embeddings, labels)
+    def train_and_get_model(self, dataset):
+        embeddings, labels = self.get_and_load_embeddings(dataset=dataset)
+        model = self.setup_and_train(embeddings, labels)
         return model
 
     def get_and_load_embeddings(self, dataset):
         self.features_reader = EmbeddingManager()
 
         if dataset is "TEST":
-            self.embeddings, self.labels = self.features_reader.load_or_create_embeddings_if_inexistent()
+            self.embeddings, self.labels = self.features_reader.load_test_embeddings()
             self.dataset = "TEST"
-        elif dataset is "DEFAULT":
+        elif dataset is "PRODUCTION":
             self.embeddings, self.labels = self.features_reader.load_default_embeddings()
-            self.dataset = "DEFAULT"
+            self.dataset = "PRODUCTION"
+        elif dataset is "STAGING":
+            self.embeddings, self.labels = self.features_reader.load_staging_embeddings()
+            self.dataset = "STAGING"
 
         return self.embeddings, self.labels
 
-    def train_and_get_model(self,embeddings, labels):
+    def setup_and_train(self, embeddings, labels):
         self.setup_classifier(embeddings, labels)
 
         # Create KFold
@@ -66,8 +63,8 @@ class SoftmaxModelTrainer:
 
     def encode_labels_and_embeddings(self, embeddings, labels):
         # Encode the labels
-        le = LabelEncoder()
-        raw_labels = le.fit_transform(labels)
+        self.label_encoder = LabelEncoder()
+        raw_labels = self.label_encoder.fit_transform(labels)
         raw_labels = raw_labels.reshape(-1, 1)
         one_hot_encoder = OneHotEncoder()
 
@@ -99,8 +96,10 @@ class SoftmaxModelTrainer:
 
     def save_results(self):
         if self.dataset == "TEST":
-            SoftmaxFileManager.save_testing_model(self.model)
-        elif self.dataset == "DEFAULT":
-            SoftmaxFileManager.save_default_model(self.model)
+            SoftmaxFileManager.save_testing_model(self.model, self.label_encoder)
+        elif self.dataset == "PRODUCTION":
+            SoftmaxFileManager.save_default_model(self.model, self.label_encoder)
+        elif self.dataset == "STAGING":
+            SoftmaxFileManager.save_staging_model(self.model, self.label_encoder)
         elif self.dataset is None:
             print("Logging: dataset not defined")

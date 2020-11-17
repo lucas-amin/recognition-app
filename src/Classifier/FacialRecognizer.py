@@ -6,6 +6,7 @@ import tensorflow as tf
 from src.Classifier.SoftmaxResultChecker import SoftmaxResultChecker
 from src.Classifier.Tracker import Tracker
 from src.Classifier.face_embedding_extractor import FaceEmbeddingExtractor
+from src.Classifier.softmax_classifier_manager import SoftmaxClassifierManager
 from src.Trainer.softmax_classifier_loader import SoftmaxFileManager
 
 
@@ -25,7 +26,8 @@ class FacialRecognizer:
 
         self.embedding_model = FaceEmbeddingExtractor()
 
-        self.softmax_model = SoftmaxFileManager.load_default_classifier()
+        self.softmax_classifier_manager = SoftmaxClassifierManager()
+        self.softmax_classifier_manager.load_production_classifier()
 
         self.clean_tf_graph()
 
@@ -36,6 +38,7 @@ class FacialRecognizer:
 
     def reset(self):
         self.tracker.reset()
+        self.softmax_classifier_manager = SoftmaxFileManager.load_default_classifier()
 
     def recognize_threadsafe(self, frame):
         with self.__Session.as_default():
@@ -86,8 +89,7 @@ class FacialRecognizer:
 
     def get_face_name(self, output_frame):
         embedding = self.embedding_model.get_face_embedding(output_frame)
-        preds = self.softmax_model.predict(embedding)
-        name, probability = self.result_checker.check_prediction(preds, embedding)
+        name, probability = self.softmax_classifier_manager.predict(embedding)
         return name, probability
 
     def get_face_image(self, bbox, frame):

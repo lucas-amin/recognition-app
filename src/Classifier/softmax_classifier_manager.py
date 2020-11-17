@@ -13,14 +13,26 @@ class SoftmaxClassifierManager:
         name, probability = self.result_checker.check_prediction(preds, embedding)
         return name, probability
 
-    def load_default_classifier(self):
+    def load_production_classifier(self):
         self.softmax_model = SoftmaxFileManager.load_default_classifier()
 
-    def train_default_classifier(self):
-        self.softmax_model = self.trainer.train_and_get_model_with_default_dataset()
+    def train_production_classifier(self):
+        self.softmax_model = self.trainer.train_and_get_model("PRODUCTION")
 
-    def load_test_classifier(self):
+    def load_unittest_classifier(self):
         self.softmax_model = SoftmaxFileManager.load_test_classifier()
 
-    def train_test_classifier(self):
-        self.softmax_model = self.trainer.train_and_get_model_with_test_dataset()
+    def train_unittest_classifier(self):
+        self.softmax_model = self.trainer.train_and_get_model("TESTING")
+
+    def load_staging_classifier(self):
+        self.softmax_model = SoftmaxFileManager.load_staging_classifier()
+
+    def train_staging_classifier(self):
+        self.softmax_model = self.trainer.train_and_get_model("STAGING")
+        self.trainer.save_results()
+
+    def reset_classifier(self, model):
+        SoftmaxFileManager.delete_model(model)
+        self.softmax_model = self.trainer.train_and_get_model(model)
+        self.trainer.save_results()

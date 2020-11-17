@@ -1,11 +1,11 @@
 from src.Classifier.face_embedding_extractor import FaceEmbeddingExtractor
-from test.tests_image_manager import TestsImageManager
+from src.Trainer.default_image_manager import DatasetImagesManager
 
 
 def test_face_embedding_extractor():
     CPU_PROCESS_FRAMES_NUMBER = 30
     embedding_extractor = FaceEmbeddingExtractor(use_gpu=False)
-    image_manager = TestsImageManager()
+    image_manager = DatasetImagesManager()
     image_dict, names = image_manager.get_testing_dataset_dict()
 
     for name in names:
@@ -19,7 +19,7 @@ def test_face_embedding_extractor():
 def test_gpu_face_embedding_extractor():
     embedding_extractor = FaceEmbeddingExtractor(use_gpu=True)
 
-    image_manager = TestsImageManager()
+    image_manager = DatasetImagesManager()
     image_dict, names = image_manager.get_testing_dataset_dict()
 
     for name in names:
